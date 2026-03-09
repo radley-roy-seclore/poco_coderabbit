@@ -72,7 +72,7 @@ ifdef POCO_VERBOSE
 $(info OSARCH              = $(OSARCH))
 endif
 
-.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install uninstall
+.PHONY: poco all libexecs cppunit trace tests samples cleans clean distclean install uninstall
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
@@ -81,11 +81,21 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis Prometheus
 
-cppunit: Foundation-libexec
+cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
 
 CppUnit-clean:
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
+
+trace:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace
+endif
+
+Trace-clean:
+ifdef POCO_ENABLE_TRACE
+	$(MAKE) -C $(POCO_BASE)/Trace clean
+endif
 
 install: libexecs
 	mkdir -p $(INSTALLDIR)/include/Poco
@@ -131,7 +141,7 @@ tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))
 samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))
 cleans: $(filter-out $(foreach f,$(OMIT),$f%),$(cleans))
 
-Foundation-libexec:
+Foundation-libexec: trace
 	$(MAKE) -C $(POCO_BASE)/Foundation
 
 Foundation-tests: Foundation-libexec cppunit
@@ -247,12 +257,12 @@ Data-libexec: Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
 DataTest-libexec: Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite/DataTest
+	$(MAKE) -C $(POCO_BASE)/Data/DataTest
 
 Data-tests: Data-libexec DataTest-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/testsuite
 
-Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec Net-libexec
+Data-samples: Data-libexec Data-libexec Data/SQLite-libexec Net-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/samples
 
 Data-clean:
@@ -418,7 +428,7 @@ Prometheus-clean:
 	$(MAKE) -C $(POCO_BASE)/Prometheus/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/Prometheus/samples clean
 
-clean: cleans CppUnit-clean
+clean: cleans Trace-clean CppUnit-clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib

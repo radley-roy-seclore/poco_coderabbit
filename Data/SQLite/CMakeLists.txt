@@ -13,10 +13,6 @@ else()
 	POCO_SOURCES(SQLITE_SRCS sqlite3
 		src/sqlite3.c
 	)
-
-	POCO_HEADERS(SQLITE_SRCS sqlite3
-		src/sqlite3.h
-	)
 endif()
 
 # Version Resource
@@ -58,6 +54,10 @@ else()
 		SQLITE_OMIT_TCL_VARIABLE
 		SQLITE_OMIT_DEPRECATED
 	)
+	option(ENABLE_DATA_SQLITE_FTS5 "Enable SQLite FTS5 Extension" OFF)
+	if(ENABLE_DATA_SQLITE_FTS5)
+		target_compile_definitions(DataSQLite PRIVATE SQLITE_ENABLE_FTS5)
+	endif()
 endif()
 
 POCO_INSTALL(DataSQLite)

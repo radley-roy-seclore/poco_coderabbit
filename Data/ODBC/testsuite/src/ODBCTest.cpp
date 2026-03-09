@@ -14,7 +14,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -43,7 +43,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
@@ -485,6 +485,18 @@ void ODBCTest::testPrepare()
 }
 
 
+void ODBCTest::testNullBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->nullBulk();
+}
+
+
 void ODBCTest::testBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -497,21 +509,21 @@ void ODBCTest::testBulk()
 		std::vector<std::string>,
 		std::vector<CLOB>,
 		std::vector<double>,
-		std::vector<DateTime> >(100);
+		std::vector<DateTime>>(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::deque<int>,
 		std::deque<std::string>,
 		std::deque<CLOB>,
 		std::deque<double>,
-		std::deque<DateTime> >(100);
+		std::deque<DateTime>>(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::list<int>,
 		std::list<std::string>,
 		std::list<CLOB>,
 		std::list<double>,
-		std::list<DateTime> >(100);
+		std::list<DateTime>>(100);
 }
 
 
@@ -1275,7 +1287,7 @@ void ODBCTest::testTransaction()
 		recreatePersonTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->transaction(_rConnectString);
+		_pExecutor->transaction(_rConnectString, _readUncommitted);
 		i += 2;
 	}
 }

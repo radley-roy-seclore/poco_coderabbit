@@ -2,55 +2,55 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{efd284a0-836e-4ec5-839a-b0ce012b452c}</UniqueIdentifier>
+      <UniqueIdentifier>{c1089f69-1043-46ef-9a00-ca6538d4f0af}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{9d2c02b3-1a4c-4f82-b246-094be9675fb7}</UniqueIdentifier>
+      <UniqueIdentifier>{26a02d46-7fba-44b2-b1ac-8a1e19a073c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{7419925d-2910-46ef-b66d-75be7083f76e}</UniqueIdentifier>
+      <UniqueIdentifier>{01ee9592-fca5-4909-befe-31d926ebeca8}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{7de21299-9fde-466e-9ce5-07fd9eca02b6}</UniqueIdentifier>
+      <UniqueIdentifier>{4d669438-6cba-4c27-90c7-961ea4ed908e}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{307e2d27-9ce4-4917-8065-d6b291d81880}</UniqueIdentifier>
+      <UniqueIdentifier>{fcad3329-3729-40aa-9e0d-a237f75f6333}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{f17dd1ac-48fc-4a78-974f-0617bb547a84}</UniqueIdentifier>
+      <UniqueIdentifier>{a478a2a9-2c1e-4308-81db-34ad56e7a980}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{4500fec7-05ca-4079-b954-0fc6b926bf80}</UniqueIdentifier>
+      <UniqueIdentifier>{fa79beed-f637-4579-88c1-efde6e913341}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{0afe4a91-71c0-4750-a29f-f8aee0a2ed3d}</UniqueIdentifier>
+      <UniqueIdentifier>{d2d0e655-5070-474b-bec5-d9ac2543abf0}</UniqueIdentifier>
     </Filter>
     <Filter Include="TestSession">
-      <UniqueIdentifier>{408adb2a-a0ba-406c-af0f-ba35c79de465}</UniqueIdentifier>
+      <UniqueIdentifier>{fef35d9e-e7c4-46d7-8620-577b5fee2ce2}</UniqueIdentifier>
     </Filter>
     <Filter Include="TestSession\Header Files">
-      <UniqueIdentifier>{6a11898f-7e83-4885-91f7-b8666ec0bfae}</UniqueIdentifier>
+      <UniqueIdentifier>{cf6ef217-908b-452f-bdf0-11a117b4bdf5}</UniqueIdentifier>
     </Filter>
     <Filter Include="TestSession\Source Files">
-      <UniqueIdentifier>{4c3df67f-20f5-41cd-a9a5-69838ddb5623}</UniqueIdentifier>
+      <UniqueIdentifier>{146ec7bc-e9af-4a5a-b65a-8c049a722dbb}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{bda62c82-7799-4e32-aa59-794187c9254c}</UniqueIdentifier>
+      <UniqueIdentifier>{2fff623a-1b1c-4683-ac59-68fca2698695}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{569ea43a-87d8-4662-87f9-e86ecdd62c85}</UniqueIdentifier>
+      <UniqueIdentifier>{11c356d1-b2a5-4a03-9ebc-a4f205e1406d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{16747406-0a06-4a3e-be49-740d0436d7b6}</UniqueIdentifier>
+      <UniqueIdentifier>{f1a49a06-f61a-4b29-8560-47e87e04752a}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser">
-      <UniqueIdentifier>{79a12ac6-a42c-44a9-9cce-5863936607d5}</UniqueIdentifier>
+      <UniqueIdentifier>{f56c1956-a2a2-4b72-977a-8e0b39f0fe01}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Header Files">
-      <UniqueIdentifier>{07db900c-1cf4-45af-8977-fa95c862e73f}</UniqueIdentifier>
+      <UniqueIdentifier>{2326e29d-7732-4249-ac04-d1125bf33723}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLParser\Source Files">
-      <UniqueIdentifier>{6037cc1b-d9ba-465c-9b57-fef469e15a68}</UniqueIdentifier>
+      <UniqueIdentifier>{c5b6a9f7-6e2b-4344-b52f-4809d88c41f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

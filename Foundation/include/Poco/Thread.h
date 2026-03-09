@@ -72,7 +72,7 @@ public:
 
 	Thread(uint32_t sigMask = 0);
 		/// Creates a thread. Call start() to start it.
-		/// 
+		///
 		/// The optional sigMask parameter specifies which signals should be blocked.
 		/// To block a specific signal, set the corresponding bit in the sigMask.
 		/// Multiple bits can be set in the mask to block multiple signals if needed.
@@ -81,7 +81,7 @@ public:
 
 	Thread(const std::string& name, uint32_t sigMask = 0);
 		/// Creates a named thread. Call start() to start it.
-		/// 
+		///
 		/// The optional sigMask parameter specifies which signals should be blocked.
 		/// To block a specific signal, set the corresponding bit in the sigMask.
 		/// Multiple bits can be set in the mask to block multiple signals if needed.
@@ -161,7 +161,7 @@ public:
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
 
-	void start(Callable target, void* pData = 0);
+	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
@@ -243,6 +243,7 @@ public:
 
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
+		/// On error, or if the platform does not support this functionality, it returns zero.
 
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.

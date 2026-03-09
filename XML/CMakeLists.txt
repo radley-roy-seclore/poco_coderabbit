@@ -58,7 +58,7 @@ else()
 		target_compile_definitions(XML PUBLIC XML_STATIC)
 	endif()
 	target_compile_definitions(XML
-		PUBLIC XML_DTD
+		PUBLIC XML_DTD XML_GE
 		PRIVATE XML_NS HAVE_EXPAT_CONFIG_H)
 endif()
 
@@ -73,3 +73,6 @@ if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
+endif()

@@ -10,9 +10,6 @@
 			</include>
 			<exclude>
 				*_*.h,
-				expat*.h,
-				zconf.h,
-				zlib.h,
 				${PocoBuild}/Util/include/Poco/Util/Units.h
 			</exclude>
 		</files>
@@ -34,10 +31,13 @@
 				${Includes},
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
+				-I/usr/include/postgresql,
 				-D_DEBUG,
 				-E,
 				-C,
-				-DPOCO_NO_GCC_API_ATTRIBUTE
+				-DPOCO_NO_GCC_API_ATTRIBUTE,
+				-DPOCO_DOC,
+				-DPOCO_SILENCE_DEPRECATED
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

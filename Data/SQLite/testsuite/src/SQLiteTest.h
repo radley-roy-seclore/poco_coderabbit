@@ -108,6 +108,7 @@ public:
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
 	void testNullable();
+	void testNullableVector();
 	void testNulls();
 	void testRowIterator();
 	void testAsync();
@@ -132,14 +133,19 @@ public:
 	void testRollbackCallback();
 	void testNotifier();
 
-	void testSessionTransaction();
+	void testSessionTransactionReadCommitted();
+	void testSessionTransactionReadUncommitted();
+	void testSessionTransactionSerializable();
+	void testSessionTransactionRepeatableRead();
 	void testTransaction();
 	void testTransactor();
 
-	void testFTS3();
+	void testFTS();
 
 	void testIllegalFilePath();
 	void testTransactionTypeProperty();
+
+	void testRecordsetCopyMove();
 
 	void setUp();
 	void tearDown();

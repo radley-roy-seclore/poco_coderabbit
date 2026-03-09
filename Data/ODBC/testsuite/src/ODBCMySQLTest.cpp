@@ -164,7 +164,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 
@@ -251,7 +251,7 @@ void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 void ODBCMySQLTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }

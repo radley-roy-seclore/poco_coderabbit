@@ -130,7 +130,7 @@ void ODBCSQLiteTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 }
@@ -168,7 +168,7 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 void ODBCSQLiteTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat REAL NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat REAL NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }

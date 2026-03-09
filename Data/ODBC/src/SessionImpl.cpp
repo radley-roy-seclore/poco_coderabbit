@@ -50,6 +50,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 
+	_db.setLoginTimeout(loginTimeout);
 	open();
 }
 
@@ -76,6 +77,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	// https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/odbc/reference/appendixes/using-the-odbc-cursor-library.md
 	setCursorUse("", ODBC_CURSOR_USE_IF_NEEDED);
 
+	_db.setLoginTimeout(getLoginTimeout());
 	open();
 }
 
@@ -96,6 +98,12 @@ SessionImpl::~SessionImpl()
 	{
 		poco_unexpected();
 	}
+}
+
+
+void SessionImpl::setName()
+{
+	setDBMSName(Utility::dbmsName(_db));
 }
 
 
@@ -153,9 +161,7 @@ void SessionImpl::open(const std::string& connect)
 	if (connectionString().empty())
 		throw InvalidArgumentException("SessionImpl::open(): Connection string empty");
 
-	SQLULEN tout = static_cast<SQLULEN>(getLoginTimeout());
-
-	if (_db.connect(connectionString(), tout))
+	if (_db.connect(connectionString(), static_cast<SQLULEN>(getLoginTimeout())))
 	{
 		setProperty("handle", _db.handle());
 
@@ -171,6 +177,8 @@ void SessionImpl::open(const std::string& connect)
 	else
 		throw ConnectionException(SQL_NULL_HDBC,
 			Poco::format("Connection to '%s' failed.", connectionString()));
+
+	setName();
 }
 
 
@@ -245,26 +253,14 @@ inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	SQLUINTEGER value = static_cast<SQLUINTEGER>(timeout);
-
-	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_TIMEOUT,
-		&value,
-		SQL_IS_UINTEGER), "Failed to set connection timeout.");
+	SQLULEN value = static_cast<SQLUINTEGER>(timeout);
+	_db.setTimeout(static_cast<int>(value));
 }
 
 
 std::size_t SessionImpl::getConnectionTimeout() const
 {
-	SQLULEN value = 0;
-
-	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_TIMEOUT,
-		&value,
-		0,
-		0), "Failed to get connection timeout.");
-
-	return value;
+	return _db.getTimeout();
 }
 
 
@@ -352,8 +348,10 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	if (isTransaction()) throw InvalidAccessException();
 
-	bool retval = true;
 	Poco::UInt32 old = getTransactionIsolation();
+	if (old == ti) return true;
+
+	bool retval = true;
 	try { setTransactionIsolationImpl(ti); }
 	catch (Poco::Exception&) { retval = false; }
 	setTransactionIsolationImpl(old);

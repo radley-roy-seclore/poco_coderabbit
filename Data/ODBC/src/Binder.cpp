@@ -120,11 +120,11 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	{
 		std::string tcVal;
 		transcode(val, tcVal);
-		size = (SQLINTEGER)tcVal.size();
+		size = static_cast<SQLINTEGER>(tcVal.size());
 		pTCVal = reinterpret_cast<char*>(std::calloc((size_t)size+1, 1));
 		std::memcpy(pTCVal, tcVal.data(), size);
 	}
-	else size = (SQLINTEGER)val.size();
+	else size = static_cast<SQLINTEGER>(val.size());
 	SQLPOINTER pVal = 0;
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -134,7 +134,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	{
 		getColumnOrParameterSize(pos, size);
 		char* pChar = (char*) std::calloc(size, sizeof(char));
-		pVal = (SQLPOINTER) pChar;
+		pVal = static_cast<SQLPOINTER>(pChar);
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
 	}
@@ -161,16 +161,18 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 	_lengthIndicator.push_back(pLenIn);
 
-	if (Utility::isError(SQLBindParameter(_rStmt,
-		(SQLUSMALLINT) pos + 1,
+	int rc = SQLBindParameter(_rStmt,
+		(SQLUSMALLINT)pos + 1,
 		toODBCDirection(dir),
 		SQL_C_CHAR,
-		Utility::sqlDataType(SQL_C_CHAR),
-		(SQLUINTEGER) colSize,
+		TypeInfo::sqlDataType<SQL_C_CHAR>(),
+		getStringColSize(colSize),
 		0,
 		pVal,
-		(SQLINTEGER) size,
-		_lengthIndicator.back())))
+		(SQLINTEGER)size,
+		_lengthIndicator.back());
+
+	if (Utility::isError(rc))
 	{
 		throw StatementException(_rStmt, "ODBC::Binder::bind(string):SQLBindParameter(std::string)");
 	}
@@ -216,8 +218,8 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 		(SQLUSMALLINT)pos + 1,
 		toODBCDirection(dir),
 		SQL_C_WCHAR,
-		Utility::sqlDataType(SQL_C_WCHAR),
-		(SQLUINTEGER)colSize,
+		TypeInfo::sqlDataType<SQL_C_WCHAR>(),
+		getStringColSize(colSize),
 		0,
 		pVal,
 		(SQLINTEGER)size,
@@ -230,7 +232,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
+	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
 
@@ -249,7 +251,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_DATE,
-		Utility::sqlDataType(SQL_C_TYPE_DATE),
+		TypeInfo::sqlDataType<SQL_C_TYPE_DATE>(),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pDS,
@@ -263,7 +265,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
+	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
 
@@ -282,7 +284,7 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_TIME,
-		Utility::sqlDataType(SQL_C_TYPE_TIME),
+		TypeInfo::sqlDataType<SQL_C_TYPE_TIME>(),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pTS,
@@ -296,7 +298,7 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
+	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
 
@@ -315,7 +317,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 		(SQLUSMALLINT) pos + 1,
 		toODBCDirection(dir),
 		SQL_C_TYPE_TIMESTAMP,
-		Utility::sqlDataType(SQL_C_TYPE_TIMESTAMP),
+		TypeInfo::sqlDataType<SQL_C_TYPE_TIMESTAMP>(),
 		colSize,
 		decDigits,
 		(SQLPOINTER) pTS,
@@ -329,7 +331,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 {
-	SQLINTEGER size = (SQLINTEGER) 16;
+	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = size;
 
@@ -373,13 +375,13 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_C_STINYINT, colSize, decDigits);
+	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
 
 	if (Utility::isError(SQLBindParameter(_rStmt,
 		(SQLUSMALLINT) pos + 1,
 		SQL_PARAM_INPUT,
-		SQL_C_STINYINT,
-		Utility::sqlDataType(SQL_C_STINYINT),
+		SQL_C_CHAR,
+		TypeInfo::sqlDataType<SQL_C_CHAR>(),
 		colSize,
 		decDigits,
 		0,
@@ -504,12 +506,23 @@ void Binder::reset()
 }
 
 
+SQLUINTEGER Binder::getStringColSize(SQLUINTEGER columnSize)
+{
+#if defined(POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT) && POCO_DATA_SQL_SERVER_BIG_STRINGS
+	if (Utility::dbmsName(_rStmt.connection()) == Utility::MS_SQL_SERVER_DBMS_NAME)
+		return SQL_SS_LENGTH_UNLIMITED;
+#endif
+	return columnSize;
+}
+
+
 void Binder::getColSizeAndPrecision(std::size_t pos,
 	SQLSMALLINT cDataType,
 	SQLINTEGER& colSize,
 	SQLSMALLINT& decDigits,
 	std::size_t actualSize)
 {
+	SQLSMALLINT sqlDataType = Utility::sqlDataType(cDataType);
 	colSize = 0;
 	decDigits = 0;
 
@@ -517,17 +530,43 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// Hence the funky flow control.
 	if (_pTypeInfo)
 	{
-		DynamicAny tmp;
+		Dynamic::Var tmp;
 		bool foundSize(false);
 		bool foundPrec(false);
+
+		// SQLServer driver reports COLUMN_SIZE 8000 for VARCHAR(MAX),
+		// so the size check must be skipped when big strings are enabled
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+		bool isVarchar(false);
+		switch (sqlDataType)
+		{
+		case SQL_VARCHAR:
+		case SQL_WVARCHAR:
+		case SQL_WLONGVARCHAR:
+			isVarchar = true;
+			break;
+		default: break;
+		}
+#endif // POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+
 		foundSize = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
 		if (foundSize) colSize = tmp;
-		if (actualSize > colSize)
+		else foundSize = _pTypeInfo->tryGetInfo(sqlDataType, "COLUMN_SIZE", tmp);
+		if (foundSize) colSize = tmp;
+
+		if (actualSize > static_cast<std::size_t>(colSize)
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+			&& !isVarchar
+#endif
+			)
 		{
-			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-					pos, actualSize, static_cast<long>(colSize)));
+			throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+				__LINE__, pos, actualSize, static_cast<long>(colSize)));
 		}
+
 		foundPrec = _pTypeInfo->tryGetInfo(cDataType, "MAXIMUM_SCALE", tmp);
+		if (foundPrec) decDigits = tmp;
+		else foundPrec = _pTypeInfo->tryGetInfo(sqlDataType, "MAXIMUM_SCALE", tmp);
 		if (foundPrec) decDigits = tmp;
 
 		if (foundSize && foundPrec)
@@ -537,8 +576,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	try
 	{
 		Parameter p(_rStmt, pos);
-		colSize = (SQLINTEGER) p.columnSize();
-		decDigits = (SQLSMALLINT) p.decimalDigits();
+		colSize = (SQLINTEGER)p.columnSize();
+		decDigits = (SQLSMALLINT)p.decimalDigits();
 		return;
 	}
 	catch (StatementException&)
@@ -548,8 +587,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	try
 	{
 		ODBCMetaColumn c(_rStmt, pos);
-		colSize = (SQLINTEGER) c.length();
-		decDigits = (SQLSMALLINT) c.precision();
+		colSize = (SQLINTEGER)c.length();
+		decDigits = (SQLSMALLINT)c.precision();
 		return;
 	}
 	catch (StatementException&)
@@ -559,8 +598,8 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	// last check, just in case
 	if ((0 != colSize) && (actualSize > colSize))
 	{
-		throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
-				pos, actualSize, static_cast<long>(colSize)));
+		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
+			__LINE__, pos, actualSize, static_cast<long>(colSize)));
 	}
 
 	return;
@@ -597,14 +636,14 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 		ODBCMetaColumn col(_rStmt, pos);
 		colSize = col.length();
 	}
-	catch (StatementException&) { }
+	catch (StatementException&){}
 
 	try
 	{
 		Parameter p(_rStmt, pos);
 		paramSize = p.columnSize();
 	}
-	catch (StatementException&) {}
+	catch (StatementException&){}
 
 	if (colSize == 0 && paramSize == 0)
 		paramSize = getParamSizeDirect(pos, size);

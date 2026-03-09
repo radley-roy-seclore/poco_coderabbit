@@ -13,16 +13,13 @@
 #ifndef SQLExecutor_INCLUDED
 #define SQLExecutor_INCLUDED
 
-
-#include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/Data/Test/SQLExecutor.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -88,8 +85,10 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = 0);
-	~SQLExecutor();
+	SQLExecutor(const std::string& name,
+				Poco::Data::Session* pSession,
+				Poco::Data::Session* pEncSession = nullptr);
+	~SQLExecutor() override;
 
 	void execute(const std::string& sql);
 		/// Execute a query.
@@ -106,7 +105,8 @@ public:
 		SQLExecutor::DataBinding bindMode,
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
-		const std::string& select = MULTI_SELECT);
+		const std::string& select = MULTI_SELECT,
+		const std::string& procCreateString = "");
 
 	void bareboneODBCStoredFuncTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
@@ -158,6 +158,8 @@ public:
 	void limitZero();
 	void prepare();
 
+	void nullBulk(const std::string& blobPlaceholder="?");
+
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")
 	{
@@ -171,7 +173,7 @@ public:
 		C5 dateTimes(size);
 		C6 bools;
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
@@ -313,7 +315,7 @@ public:
 		C4 floats;
 		C5 dateTimes(size);
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
@@ -495,7 +497,7 @@ public:
 	void internalBulkExtractionUTF16();
 	void internalStorageType();
 	void nulls();
-	void notNulls(const std::string& sqlState = "23502");
+	void notNulls(const std::vector<std::string>& sqlStates = {std::string("23502")});
 	void rowIterator();
 	void stdVectorBool();
 
@@ -517,7 +519,7 @@ public:
 
 	void sessionTransaction(const std::string& connect);
 	void sessionTransactionNoAutoCommit(const std::string& connect);
-	void transaction(const std::string& connect);
+	void transaction(const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
 
@@ -716,6 +718,12 @@ inline void SQLExecutor::limitPrepare()
 inline void SQLExecutor::prepare()
 {
 	_dataExecutor.prepare();
+}
+
+
+inline void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
+{
+	_dataExecutor.nullBulk(blobPlaceholder);
 }
 
 
@@ -994,9 +1002,9 @@ inline void SQLExecutor::sessionTransactionNoAutoCommit(const std::string& conne
 }
 
 
-inline void SQLExecutor::transaction(const std::string& connect)
+inline void SQLExecutor::transaction(const std::string& connect, bool readUncommitted)
 {
-	_dataExecutor.transaction("odbc", connect);
+	_dataExecutor.transaction("odbc", connect, readUncommitted);
 }
 
 
