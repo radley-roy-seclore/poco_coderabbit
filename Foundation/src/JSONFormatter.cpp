@@ -170,10 +170,11 @@ const std::string& JSONFormatter::getPriorityName(int prio)
 		"notice"s,
 		"information"s,
 		"debug"s,
-		"trace"
+		"trace"s,
+		"noprio"
 	};
 
-	poco_assert (prio >= Message::PRIO_FATAL && prio <= Message::PRIO_TRACE);
+	poco_assert (prio >= Message::PRIO_FATAL && prio <= Message::PRIO_NOPRIO);
 	
 	return PRIORITY_NAMES[prio];
 }
