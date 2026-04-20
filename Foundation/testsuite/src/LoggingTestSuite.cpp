@@ -10,6 +10,7 @@
 
 #include "Poco/Foundation.h"
 #include "LoggingTestSuite.h"
+#include "MessageTest.h"
 #include "LoggerTest.h"
 #ifdef POCO_ENABLE_FASTLOGGER
 #include "FastLoggerTest.h"
@@ -29,6 +30,7 @@ CppUnit::Test* LoggingTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LoggingTestSuite");
 
+	pSuite->addTest(MessageTest::suite());
 	pSuite->addTest(LoggerTest::suite());
 #ifdef POCO_ENABLE_FASTLOGGER
 	pSuite->addTest(FastLoggerTest::suite());
